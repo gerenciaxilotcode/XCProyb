@@ -16,114 +16,141 @@ model AdminUser {
   updatedAt    DateTime @updatedAt
 }
 
-model Sector {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  slug      String    @unique
-  projects  Project[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Project {
-  id               String   @id @default(cuid())
-  name             String
-  slug             String   @unique
-  shortDescription String
-  description      String
-  objective        String
-  problem          String
-  solution         String
-  targetAudience   String
-  research          String?
-  marketResearch    String?
-  results           String?
-  coverImage       String?
-  coverImagePublicId String?
-  demoUrl          String?
-  githubUrl        String?
-  featured         Boolean  @default(false)
-  published        Boolean  @default(false)
-  sectorId         String?
-  sector           Sector?  @relation(fields: [sectorId], references: [id])
-  technologies     ProjectTechnology[]
-  features         ProjectFeature[]
-  modules          ProjectModule[]
-  requirements     ProjectRequirement[]
-  images           ProjectImage[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([published])
-  @@index([featured])
-}
-
-model ProjectTechnology {
+model MediaAsset {
   id        String   @id @default(cuid())
-  name      String
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-}
-
-model ProjectFeature {
-  id        String   @id @default(cuid())
-  title     String
-  order     Int      @default(0)
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-}
-
-model ProjectModule {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  order       Int     @default(0)
-  projectId   String
-  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-}
-
-model ProjectRequirement {
-  id        String  @id @default(cuid())
-  title     String
-  order     Int     @default(0)
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-}
-
-model ProjectImage {
-  id        String   @id @default(cuid())
+  publicId  String   @unique
   url       String
-  publicId  String
-  order     Int      @default(0)
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  secureUrl String
+  format    String?
+  width     Int?
+  height    Int?
+  bytes     Int?
+  altText   String?
+  label     String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([projectId])
+  homeHeroes          HomeHero[]
+  brandLogos          BrandSettings[]  @relation("BrandLogo")
+  brandFavicons       BrandSettings[]  @relation("BrandFavicon")
+  sectors             Sector[]
+  services            Service[]
+  differentiators     Differentiator[]
+  offers              Offer[]
 }
 
-model Promotion {
-  id                String    @id @default(cuid())
+model HomeHero {
+  id                String   @id @default("main")
+  eyebrow           String
   title             String
-  slug              String    @unique
-  description       String
-  discountText      String?
-  imageUrl          String?
-  cloudinaryPublicId String?
-  startDate         DateTime?
-  endDate           DateTime?
-  active            Boolean   @default(false)
-  featured          Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  subtitle          String
+  ctaPrimaryLabel   String
+  ctaSecondaryLabel String
+  tagline           String
+  imageAssetId      String?
+  imageAsset        MediaAsset? @relation(fields: [imageAssetId], references: [id])
+  updatedAt         DateTime @updatedAt
+}
+
+model CtaBlock {
+  id          String   @id @default("main")
+  title       String
+  description String
+  buttonLabel String
+  updatedAt   DateTime @updatedAt
+}
+
+model BrandSettings {
+  id             String   @id @default("main")
+  name           String
+  tagline        String
+  description    String
+  logoAssetId    String?
+  logoAsset      MediaAsset? @relation("BrandLogo", fields: [logoAssetId], references: [id])
+  faviconAssetId String?
+  faviconAsset   MediaAsset? @relation("BrandFavicon", fields: [faviconAssetId], references: [id])
+  updatedAt      DateTime @updatedAt
+}
+
+model ContactInfo {
+  id              String   @id @default("main")
+  phone           String?
+  email           String?
+  whatsappNumber  String
+  whatsappMessage String?
+  address         String?
+  schedule        String?
+  instagramUrl    String?
+  facebookUrl     String?
+  linkedinUrl     String?
+  updatedAt       DateTime @updatedAt
+}
+
+model ProcessStep {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String
+  description String
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  title         String
+  description   String
+  iconKey       String
+  imageAssetId  String?
+  imageAsset    MediaAsset? @relation(fields: [imageAssetId], references: [id])
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+}
+
+model Sector {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  name          String
+  description   String?
+  imageAssetId  String?
+  imageAsset    MediaAsset? @relation(fields: [imageAssetId], references: [id])
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+}
+
+model Differentiator {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  title         String
+  description   String
+  iconKey       String
+  imageAssetId  String?
+  imageAsset    MediaAsset? @relation(fields: [imageAssetId], references: [id])
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model Offer {
+  id           String    @id @default(cuid())
+  title        String
+  description  String
+  priceText    String?
+  ctaLabel     String?
+  ctaLink      String?
+  imageAssetId String?
+  imageAsset   MediaAsset? @relation(fields: [imageAssetId], references: [id])
+  startDate    DateTime?
+  endDate      DateTime?
+  active       Boolean   @default(false)
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([active])
 }

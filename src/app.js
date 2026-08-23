@@ -8,6 +8,9 @@ import { errorHandler } from './middleware/errorHandler.js'
 import healthRoutes from './routes/healthRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import contactRoutes from './routes/contactRoutes.js'
+import contentRoutes from './routes/contentRoutes.js'
+import adminContentRoutes from './routes/adminContentRoutes.js'
+import mediaRoutes from './routes/mediaRoutes.js'
 
 const app = express()
 
@@ -38,6 +41,9 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/content', contentRoutes)
+app.use('/api/admin/content', adminContentRoutes)
+app.use('/api/admin/media', mediaRoutes)
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Recurso no encontrado.' })
