@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Sector {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String
+  description      String
+  objective        String
+  problem          String
+  solution         String
+  targetAudience   String
+  research          String?
+  marketResearch    String?
+  results           String?
+  coverImage       String?
+  coverImagePublicId String?
+  demoUrl          String?
+  githubUrl        String?
+  featured         Boolean  @default(false)
+  published        Boolean  @default(false)
+  sectorId         String?
+  sector           Sector?  @relation(fields: [sectorId], references: [id])
+  technologies     ProjectTechnology[]
+  features         ProjectFeature[]
+  modules          ProjectModule[]
+  requirements     ProjectRequirement[]
+  images           ProjectImage[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([published])
+  @@index([featured])
+}
+
+model ProjectTechnology {
+  id        String   @id @default(cuid())
+  name      String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectFeature {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int      @default(0)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectModule {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  order       Int     @default(0)
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectRequirement {
+  id        String  @id @default(cuid())
+  title     String
+  order     Int     @default(0)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectImage {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String
+  order     Int      @default(0)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model Promotion {
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  description       String
+  discountText      String?
+  imageUrl          String?
+  cloudinaryPublicId String?
+  startDate         DateTime?
+  endDate           DateTime?
+  active            Boolean   @default(false)
+  featured          Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([active])
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  CONTACTED
+  ARCHIVED
+}
+
+enum ProjectType {
+  WEBSITE
+  ADMIN_SYSTEM
+  ONLINE_STORE
+  CUSTOM_APP
+  AUTOMATION
+  OTHER
+}
+
+model ContactMessage {
+  id          String        @id @default(cuid())
+  name        String
+  business    String?
+  email       String
+  phone       String?
+  projectType ProjectType
+  budget      String?
+  message     String
+  status      ContactStatus @default(NEW)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+}
