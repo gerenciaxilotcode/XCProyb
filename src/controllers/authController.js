@@ -6,8 +6,8 @@ import { env } from '../config/env.js'
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true,
-  sameSite: 'none',
+  secure: env.isProduction,
+  sameSite: env.isProduction ? 'none' : 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/'
 }
@@ -25,7 +25,12 @@ export async function login(req, res) {
     return failure(res, 'Credenciales inválidas.', 401)
   }
 
-  const valid = await verifyPassword(admin.passwordHash, password)
+  let valid = false
+  try {
+    valid = await verifyPassword(admin.passwordHash, password)
+  } catch {
+    valid = false
+  }
 
   if (!valid) {
     return failure(res, 'Credenciales inválidas.', 401)
